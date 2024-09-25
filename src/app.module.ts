@@ -3,10 +3,23 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
 import { UserModule } from './user/user.module';
+import { WhatsappService } from './whatsapp/whatsapp.service';
+import { WhatsappController } from './whatsapp/whatsapp.controller';
+import { ConfigModule } from '@nestjs/config';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { WhatsappnpmModule } from './run/whatsappnpm/whatsappnpm.module';
 
 @Module({
-  imports: [DatabaseModule, UserModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    DatabaseModule,
+    UserModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    WhatsappModule,
+    WhatsappnpmModule,
+  ],
+  controllers: [AppController, WhatsappController],
+  providers: [AppService, WhatsappService],
 })
 export class AppModule {}
