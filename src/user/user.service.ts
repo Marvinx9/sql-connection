@@ -1,20 +1,43 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { Pool } from 'pg';
+import { Injectable } from '@nestjs/common';
+import { DatabaseService } from 'src/shared/database/Database.service';
 
 @Injectable()
 export class UserService {
-  constructor(@Inject('DATABASE_POOL') private pool: Pool) {}
+  constructor(private readonly dataBaseService: DatabaseService) {}
 
   async findUserById(id: string) {
-    const sql = `SELECT * FROM users WHERE id = $1`;
-    const result = await this.pool.query(sql, [id]);
-    return result.rows[0];
+    const sql = `
+    SELECT
+      *
+    FROM users
+    WHERE id = :id
+    `;
+
+    const binds = { id };
+
+    const result = await this.dataBaseService.query(sql, binds);
+    return result[0];
   }
 
   async createUser(name: string, email: string, password: string) {
-    const sql =
-      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *';
-    const result = await this.pool.query(sql, [name, email, password]);
-    return result.rows[0];
+    const sql = `
+      INSERT INTO users (
+        name,
+        email,
+        password
+        ) VALUES (
+        :name,
+        :email,
+        :password
+        ) 
+        `;
+
+    const binds = {
+      name,
+      email,
+      password,
+    };
+
+    return await this.dataBaseService.query(sql, binds);
   }
 }

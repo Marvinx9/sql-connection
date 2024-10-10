@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable, Logger } from '@nestjs/common';
 import * as oracledb from 'oracledb';
+import { IDatabase } from './IDatabase';
 
 @Injectable()
-export class DatabaseService {
+export class DatabaseService implements IDatabase {
   public oracle: typeof oracledb & { OBJECT: number };
 
   private logger = new Logger('DatabaseService');
@@ -129,6 +130,40 @@ export class DatabaseService {
     } catch (err) {
       if (isLogging) this.logger.debug(`query: ${sql}`);
       this.logger.error(`query: ${err.stack}`);
+      throw new Error(err);
+    }
+  }
+
+  async queryBindOut<T>(
+    sql: string,
+    binds: oracledb.BindParameters = {},
+    connection: oracledb.Connection | null = null,
+  ): Promise<oracledb.Result<T>> {
+    let isOpenTransaction = true;
+
+    const isLogging = process.env.DB_LOGGING_SOLUS as string;
+
+    try {
+      if (!connection) {
+        connection = await this.open();
+        isOpenTransaction = false;
+      }
+
+      const options = {
+        outFormat: this.oracle.OBJECT,
+        maxRows: 1000,
+        dir: this.oracle.BIND_IN,
+      };
+
+      const result = await connection.execute<T>(sql, binds, options);
+
+      if (!isOpenTransaction) this.commitAndClose(connection);
+      if (isLogging) this.logger.debug(sql);
+
+      return result;
+    } catch (err) {
+      if (isLogging) this.logger.debug(`queryBindOut: ${sql}`);
+      this.logger.error(`queryBindOut: ${err.stack}`);
       throw new Error(err);
     }
   }
