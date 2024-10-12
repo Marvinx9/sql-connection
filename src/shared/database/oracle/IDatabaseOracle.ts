@@ -1,6 +1,6 @@
 import * as oracledb from 'oracledb';
 
-export interface IDatabase {
+export interface IDatabaseOracle {
   createPool(): Promise<void>;
 
   open(): Promise<oracledb.Connection>;

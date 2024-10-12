@@ -7,7 +7,7 @@ import { WhatsappController } from './whatsapp/whatsapp.controller';
 import { ConfigModule } from '@nestjs/config';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { WhatsappnpmModule } from './run/whatsappnpm/whatsappnpm.module';
-import { DatabaseModule } from './shared/database/Database.module';
+import { DatabaseModule } from './shared/database/database.module';
 
 @Module({
   imports: [

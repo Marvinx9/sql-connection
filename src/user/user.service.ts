@@ -1,21 +1,21 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from 'src/shared/database/Database.service';
+import { DatabaseServicePg } from 'src/shared/database/postgres/dataBasePg.service';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly dataBaseService: DatabaseService) {}
+  constructor(private readonly databaseServicePg: DatabaseServicePg) {}
 
   async findUserById(id: string) {
     const sql = `
     SELECT
       *
     FROM users
-    WHERE id = :id
+    WHERE id = $1
     `;
 
-    const binds = { id };
+    const binds = [id];
 
-    const result = await this.dataBaseService.query(sql, binds);
+    const result = await this.databaseServicePg.query(sql, binds);
     return result[0];
   }
 
@@ -26,18 +26,14 @@ export class UserService {
         email,
         password
         ) VALUES (
-        :name,
-        :email,
-        :password
+        $1,
+        $2,
+        $3
         ) 
         `;
 
-    const binds = {
-      name,
-      email,
-      password,
-    };
+    const binds = [name, email, password];
 
-    return await this.dataBaseService.query(sql, binds);
+    return await this.databaseServicePg.query(sql, binds);
   }
 }

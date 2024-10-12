@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable, Logger } from '@nestjs/common';
 import * as oracledb from 'oracledb';
-import { IDatabase } from './IDatabase';
+import { IDatabaseOracle } from './IDatabaseOracle';
 
 @Injectable()
-export class DatabaseService implements IDatabase {
+export class DatabaseServiceOracle implements IDatabaseOracle {
   public oracle: typeof oracledb & { OBJECT: number };
 
   private logger = new Logger('DatabaseService');
@@ -23,9 +23,9 @@ export class DatabaseService implements IDatabase {
   async createPool() {
     try {
       await this.oracle.createPool({
-        user: process.env.DB_USER,
-        password: process.env.DB_PASSWORD,
-        connectString: `${process.env.DB_HOST}:${process.env.DB_PORT}/${process.env.DB_DATABASE}`,
+        user: process.env.DB_USER_ORA,
+        password: process.env.DB_PASSWORD_ORA,
+        connectString: `${process.env.DB_HOST_ORA}:${process.env.DB_PORT_ORA}/${process.env.DB_DATABASE_ORA}`,
         poolIncrement: 3,
         poolMax: 25,
         poolMin: 3,
